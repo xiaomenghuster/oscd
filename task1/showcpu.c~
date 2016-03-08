@@ -9,60 +9,67 @@
 #include <time.h>
 #define FILEPATH "/proc/stat"
 #define INTERVAL 1
+#define REFRESH 2
+#define CYCLE 150
 int main(){
-	int i;
+	WINDOW *subw;
+	int i,j=0;
 	int stat[10];
-	int total1=0,total2=0,idle1,idle2;
+	int total1,total2,idle1,idle2;
 	float usage;
 	char cpu[5]; //存放文件开头的cpu字符
 	FILE *file;
-	file=fopen(FILEPATH,"r");
-	fscanf(file,"%s",cpu);
-	printf("%s  ",cpu);
-	for(i=0;i<10;i++){
-		fscanf(file,"%d",&stat[i]);
-		printf("%d\t",stat[i]);
-		fgetc(file);
+	initscr();    //开始curses编程
+	subw=newwin(10,COLS,5,0);
+
+	while(j<CYCLE){
+		total1=total2=0;
+		wclear(subw);
+		file=fopen(FILEPATH,"r");
+		fscanf(file,"%s",cpu);
+		wprintw(subw,"%s  ",cpu);
+		//wprintw(subw,"hello");
+		for(i=0;i<10;i++){
+			fscanf(file,"%d",&stat[i]);
+			wprintw(subw,"%d    ",stat[i]);
+			fgetc(file);
+		}
+		for(i=0;i<10;i++){
+			total1+=stat[i];
+		}   			//accumulate to total;
+		idle1=stat[3];  //idle is the fourth number;
+		wprintw(subw,"\n");
+		//wrefresh(subw);	
+		//第二次取值
+		sleep(INTERVAL);   //时间间隔
+		rewind(file);  //将文件内部的位置指针重新指向流的开头
+		fscanf(file,"%s",cpu);
+		wprintw(subw,"%s  ",cpu);
+		for(i=0;i<10;i++){
+			fscanf(file,"%d",&stat[i]);
+			wprintw(subw,"%d    ",stat[i]);
+			//fgetc(file);
+		}
+		for(i=0;i<10;i++){
+			total2+=stat[i];
+		}   			//accumulate to total;
+		idle2=stat[3];  //idle is the fourth number;
+		wprintw(subw,"\n");
+		//calc the usage;
+		usage=(float)(total2-total1-(idle2-idle1))/(total2-total1)*100;
+		wprintw(subw,"total=%d\n",total2-total1);
+		wprintw(subw,"idle=%d\n",idle2-idle1);
+		wprintw(subw,"cpu use: %.2f%%\n",usage);
+		wrefresh(subw);
+		sleep(REFRESH);
+		j++;
+		fclose(file);
 	}
-	for(i=0;i<10;i++){
-		total1+=stat[i];
-	}   			//accumulate to total;
-	idle1=stat[3];  //idle is the fourth number;
-	printf("\n");
-	//第二次取值
-	sleep(INTERVAL);   //时间间隔
-	rewind(file);  //将文件内部的位置指针重新指向流的开头
-	fscanf(file,"%s",cpu);
-	printf("%s  ",cpu);
-	for(i=0;i<10;i++){
-		fscanf(file,"%d",&stat[i]);
-		printf("%d\t",stat[i]);
-		fgetc(file);
-	}
-	for(i=0;i<10;i++){
-		total2+=stat[i];
-	}   			//accumulate to total;
-	idle2=stat[3];  //idle is the fourth number;
-	printf("\n");
-	fclose(file);
-	//calc the usage;
-	//usage=(total2-total1-(idle2-idle1))/(total2-total1);
-	usage=(float)(total2-total1-(idle2-idle1))/(total2-total1);
-	printf("total=%d\n",total2-total1);
-	printf("idle=%d\n",idle2-idle1);
-	printf("cpu use: %.2f%%\n",usage);
-	/*initscr();    //开始curses编程
-	while(i<=10){
-		clear();
-	    move(10,20);	
-		
-		refresh();
-		sleep(2);
-		i--;
-	}
-    endwin();*/
+    endwin();
 	return 0;
 }
+
+
 
 /*
 1、 采样两个足够短的时间间隔的Cpu快照，分别记作t1,t2，其中t1、t2的结构均为：

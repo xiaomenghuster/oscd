@@ -1,0 +1,6 @@
+*.txt~
+*.c~
+test.c
+test
+.gitignore~
+../readme.txt~

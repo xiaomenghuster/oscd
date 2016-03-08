@@ -7,15 +7,25 @@
  */
 
 #include <curses.h>
+#include <pthread.h>
+
+pid_t pid1,pid2,pid3;
+
 int main()
 {
-    initscr();    
-    clear();
-    move(10,20);
-    addstr("hello,world");
-    move(LINES-1,0);
-    refresh();
-    getch();
-    endwin();
+    if((pid1=fork())==0){
+		execv("./showtime",NULL);
+	}
+	else {	
+		if((pid2=fork())==0)
+			execv("./showcpu",NULL);
+		else{ 
+			if((pid3=fork())==0)
+				execv("./accumulate",NULL);		
+		}
+	}
+	wait(NULL);
+	wait(NULL);
+	wait(NULL);
     return 0;
 }

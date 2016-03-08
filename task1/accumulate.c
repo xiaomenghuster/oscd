@@ -6,18 +6,21 @@
 
 #include <curses.h>
 #include <time.h>
+#define REFRESH 3
 
 int main(){
+	WINDOW *subw;
 	int i=1,sum=0;
 	initscr();    //开始curses编程
+	subw=newwin(3,COLS,15,0);
 	while(i<=100){
-		clear();
-	    move(10,20);	
-		printw("i=%d,sum=%d\n\n",i,sum);
-		printw("\t\t    %d+%d=%d",i,sum,i+sum);
+		wclear(subw);
+	    //move(10,20);	
+		wprintw(subw,"i=%d,sum=%d\n\n",i,sum);
+		wprintw(subw,"%d+%d=%d",i,sum,i+sum);
 		sum+=i;
-		refresh();
-		sleep(3);  //3秒刷新一次
+		wrefresh(subw);
+		sleep(REFRESH);  //3秒刷新一次
 		i++;	   // i递增
 	}
     endwin();
