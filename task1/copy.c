@@ -12,10 +12,15 @@
 int main(){
 	char c;
 	FILE *fout,*fin;
-	fout=fopen(SOURCEFILE,"rb");
-	fin=fopen(DESTINATIONFILE,"wb");
+	char sourfile[50],destfile[50];
+	printf("please input the source file:\n");
+	scanf("%s",sourfile);
+	printf("please input the destination file:\n");
+	scanf("%s",destfile);
+	fout=fopen(sourfile,"rb");
+	fin=fopen(destfile,"wb");
 	if(fout==NULL|fin==NULL){
-		printf("fail to open file!");
+		printf("fail to open file!\n");
 		return 0;	
 	}
 	while(!feof(fout)){

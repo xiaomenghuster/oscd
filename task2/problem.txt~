@@ -1,0 +1,14 @@
+fatal error: openssl/aes.h: No such file or directory
+你尝试编译的程序使用OpenSSL，但是需要和OpenSSL链接的文件（库和头文件）在你Linux平台上缺少。
+要解决这个问题，你需要安装OpenSSL 开发包，这在所有的现代Linux发行版的标准软件仓库中都有。
+
+要在Debian、Ubuntu或者其他衍生版上安装OpenSSL：
+
+    $ sudo apt-get install libssl-dev
+
+# 卷空间不足
+# FILE 类型不确定
+# 没有什么可以做为all
+
+
+
